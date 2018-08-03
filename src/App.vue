@@ -20,7 +20,6 @@ export default {
   name: 'App',
   computed: {
     cartList () {
-      console.log(this.$store.state.cartList)
       return this.$store.state.cartList;
     }
   }

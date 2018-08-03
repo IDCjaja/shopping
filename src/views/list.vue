@@ -42,14 +42,15 @@
       </div>
     </div>
     <Product
-      v-for="item in list"
+      v-for="item in filteredAndOrderedList"
       :info="item"
       :key="item.id"></Product>
+    <div class="product-not-found" v-show="!filteredAndOrderedList.length">暂无相关商品</div>
   </div>
 </template>
 
 <script>
-import Product from './product.vue'
+import Product from '../components/product.vue'
 export default {
   data () {
     return {
@@ -57,6 +58,10 @@ export default {
       filterBrand: '',
       filterColor: ''
     }
+  },
+  mounted () {
+    //初始化时，通过vuex的action请求数据
+    return this.$store.dispatch('getProductList')
   },
   components: {
     Product
@@ -73,20 +78,23 @@ export default {
     },
     filteredAndOrderedList () {
       let list = [...this.list]
-      if (this.order !== '') {
-        if (this.order === 'sales') {
-          list = list.sort((a,b) => b.sales - a.sales);
-        } else if (this.order === 'cost-desc') {
-          list = list.sort((a,b) => b.cost - a.cost);
-        } else if (this.order === 'cost-asc') {
-          list = list.sort((a,b) => a.cost - b.cost);
-        }
-      }
+      //按品牌过滤
       if (this.filterBrand !== '') {
         list = list.filter(item => item.brand === this.filterBrand);
       }
-      if (this.filterColor) {
+      //按颜色过滤
+      if (this.filterColor !== '') {
         list = list.filter(item => item.color === this.filterColor);
+      }
+      //排序
+      if (this.order !== '') {
+        if (this.order === 'sales') {
+          list = list.sort((a, b) => b.sales - a.sales);
+        } else if (this.order === 'cost-desc') {
+          list = list.sort((a, b) => b.cost - a.cost);
+        } else if (this.order === 'cost-asc') {
+          list = list.sort((a, b) => a.cost - b.cost);
+        }
       }
       return list;
     }
@@ -106,13 +114,14 @@ export default {
       }
     },
     handleFilterBrands (brand) {
+      //单次点击选中，再次点击取消选中
       if (this.filterBrand === brand) {
         this.filterBrand = '';
       } else {
         this.filterBrand = brand;
       }
     },
-    handleFilterColor (color) {
+    handleFilterColors (color) {
       if(this.filterColor === color) {
         this.filterColor = '';
       } else {

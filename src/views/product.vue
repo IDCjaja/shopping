@@ -1,6 +1,6 @@
 <template>
   <div v-if="product">
-    <div class="product">
+    <div class="product-introduce">
       <div class="product-image">
         <img :src="product.image" />
       </div>
